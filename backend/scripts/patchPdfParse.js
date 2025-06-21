@@ -13,16 +13,18 @@ const filePath = path.join(__dirname, "../node_modules/pdf-parse/index.js");
 if (fs.existsSync(filePath)) {
   let content = fs.readFileSync(filePath, "utf8");
 
-  const startMarker = "let isDebugMode = !module.parent;";
-  const testBlockRegex = /if\s*\(isDebugMode\)\s*\{[\s\S]*?\}/gm;
+  // Markers and fix
+  const debugStart = "let isDebugMode = !module.parent;";
+  const debugBlockRegex = /if\s*\(isDebugMode\)\s*\{[\s\S]*?\}\s*/gm;
 
-  if (testBlockRegex.test(content)) {
-    const patchedContent = content.replace(testBlockRegex, "// 🚫 Removed debug block");
-    fs.writeFileSync(filePath, patchedContent, "utf8");
+  if (debugBlockRegex.test(content)) {
+    const cleaned = content.replace(debugBlockRegex, "// 🚫 Removed debug block\n");
+    fs.writeFileSync(filePath, cleaned, "utf8");
     console.log("✅ Patched pdf-parse/index.js successfully.");
   } else {
-    console.log("⚠️ No debug block found, already patched.");
+    console.log("⚠️ No debug block found, already clean.");
   }
 } else {
   console.error("❌ File not found:", filePath);
 }
+
