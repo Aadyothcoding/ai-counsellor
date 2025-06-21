@@ -1,13 +1,15 @@
+
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI Career Counselor Backend",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "postinstall": "node scripts/patchPdfParse.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Aadyoth",
   "license": "ISC",
   "type": "module",
   "dependencies": {
