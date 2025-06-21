@@ -3,28 +3,21 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Setup __dirname for ESM
+// Setup __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to index.js of pdf-parse
-const filePath = path.join(__dirname, "../node_modules/pdf-parse/index.js");
+// Locate index.js in pdf-parse
+const indexPath = path.join(__dirname, "../node_modules/pdf-parse/index.js");
 
-if (fs.existsSync(filePath)) {
-  let content = fs.readFileSync(filePath, "utf8");
+if (fs.existsSync(indexPath)) {
+  let content = fs.readFileSync(indexPath, "utf8");
 
-  // Markers and fix
-  const debugStart = "let isDebugMode = !module.parent;";
-  const debugBlockRegex = /if\s*\(isDebugMode\)\s*\{[\s\S]*?\}\s*/gm;
+  // Remove the debug block that causes crash
+  const patchedContent = content.replace(/let isDebugMode = !module\.parent;[\s\S]*?if\s*\(isDebugMode\)\s*\{[\s\S]*?\}/, "// 🔧 Patched out test block");
 
-  if (debugBlockRegex.test(content)) {
-    const cleaned = content.replace(debugBlockRegex, "// 🚫 Removed debug block\n");
-    fs.writeFileSync(filePath, cleaned, "utf8");
-    console.log("✅ Patched pdf-parse/index.js successfully.");
-  } else {
-    console.log("⚠️ No debug block found, already clean.");
-  }
+  fs.writeFileSync(indexPath, patchedContent, "utf8");
+  console.log("✅ Patched pdf-parse/index.js");
 } else {
-  console.error("❌ File not found:", filePath);
+  console.error("❌ Could not find index.js at:", indexPath);
 }
-
