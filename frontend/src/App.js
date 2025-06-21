@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import jsPDF from "jspdf";
 import "./App.css";
 
 function AccordionSection({ title, content }) {
@@ -63,6 +64,34 @@ function App() {
     setLoading(false);
   };
 
+  // PDF Download Handler
+  const handleDownloadPDF = () => {
+    if (!sections.length) return;
+    const doc = new jsPDF();
+    let y = 15;
+
+    doc.setFontSize(18);
+    doc.text("AI Career Counselor Report", 10, y);
+    y += 10;
+
+    doc.setFontSize(12);
+    sections.forEach((section) => {
+      doc.setFont(undefined, "bold");
+      doc.text(section.title, 10, y);
+      y += 7;
+      doc.setFont(undefined, "normal");
+      const lines = doc.splitTextToSize(section.content, 180);
+      doc.text(lines, 10, y);
+      y += lines.length * 7 + 5;
+      if (y > 270) {
+        doc.addPage();
+        y = 10;
+      }
+    });
+
+    doc.save("career-guidance.pdf");
+  };
+
   return (
     <div className="app-root">
       <div className="app-container">
@@ -104,11 +133,20 @@ function App() {
         {sections.length > 0 && (
           <div className="result-box">
             <h2 className="result-title">Your Personalized Guidance:</h2>
+            <button
+              className="form-button"
+              style={{ marginBottom: 16 }}
+              onClick={handleDownloadPDF}
+            >
+              Download PDF Report
+            </button>
             {sections.map((section, index) => (
               <AccordionSection
                 key={index}
                 title={section.title}
-                content={<div style={{ whiteSpace: "pre-line" }}>{section.content}</div>}
+                content={
+                  <div style={{ whiteSpace: "pre-line" }}>{section.content}</div>
+                }
               />
             ))}
           </div>
